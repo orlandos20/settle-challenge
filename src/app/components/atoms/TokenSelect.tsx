@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 
 type SelectOption = {
-    value: string,
+    value: number,
     label: string,
 }
 

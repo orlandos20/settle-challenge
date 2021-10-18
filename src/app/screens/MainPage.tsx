@@ -59,9 +59,7 @@ const MainPage: React.FC = ({children}) => {
             </div>
         </Page>
 
-        <OperationModal onClose={closeModal} show={showModal} modalProps={modalProps}>
-            <span> hola</span>
-        </OperationModal>
+        <OperationModal onClose={closeModal} show={showModal} modalProps={modalProps} />
         </>
     )
 }

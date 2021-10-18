@@ -4,13 +4,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {ThemeProvider} from 'styled-components';
-import {light, dark} from './ui-core/styles/theme';
+import {store, persistor} from './adapter/reduxHooks/store';
+import {PersistGate} from 'redux-persist/integration/react';
+import {Provider} from 'react-redux';
+import {BrowserRouter as Router} from 'react-router-dom';
+import {light, dark} from './app/ui-core/styles/theme';
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={light}>
-      <App />
-    </ThemeProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider theme={light}>
+          <Router>
+            <App />
+          </Router>
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
