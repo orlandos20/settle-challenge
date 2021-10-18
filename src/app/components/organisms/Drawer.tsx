@@ -17,7 +17,7 @@ const StyledDrawer = styled.div`
     position: relative;
     min-width: 0px;
     overflow-wrap: break-word;
-    background-color: rgb(255,255,255);
+    ${({ theme: { colors } }) => `background-color: ${colors.bg};`}
     background-clip: border-box;
     border: 0px solid rgba(0,0,0,0.125);
     border-radius: 1rem;

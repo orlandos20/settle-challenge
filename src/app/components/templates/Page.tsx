@@ -22,7 +22,7 @@ const Page: React.FC<PageProps> = ({children}) => {
                         title={"dashboard"} 
                         value={""} 
                         icon={"test"} 
-                        width={240} 
+                        width={200} 
                         height={80} 
                         onClick={() => replace(`/${MAIN.dashboard}`) } 
                     />
