@@ -68,12 +68,13 @@ type TokenCardProps = {
     value: string,
     icon: any,
     width?: number | undefined,
+    height?: number | undefined,
     onClick?: (() => any | void) | undefined 
 }
 
-const TokenCard: React.FC<TokenCardProps> = ({title, value, icon, width, onClick}) => {
+const TokenCard: React.FC<TokenCardProps> = ({title, value, icon, width, height, onClick}) => {
     return (
-        <Card width={width ? width : undefined} onClick={onClick}>
+        <Card width={width ? width : undefined} height={height ? height : undefined} onClick={onClick}>
             <CardContentLayout>
                 <LeftSideCardContent>
                     <span className="token-title">{title}</span>

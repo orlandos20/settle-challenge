@@ -33,7 +33,8 @@ export const OrderSlice = createSlice({
     reducers:{
         updateOrders: (state, action) => {
             state.orders = [...state.orders, action.payload]
-        }
+        },
+      
     },
     extraReducers: (builder) => {
     }

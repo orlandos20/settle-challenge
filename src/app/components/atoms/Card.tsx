@@ -4,11 +4,13 @@ import styled from '../../ui-core/styled-components';
 type CardProps = {
     children: React.ReactElement | React.ReactElement[],
     width?: number | undefined,
+    height?: number | undefined,
     onClick?: (() => any | void) | undefined 
 }
 
 const CardContainer = styled.div<CardProps>`
     ${({ width }) => width ? `width: ${width}px;` : ''}
+    ${({ height }) => height ? `height: ${height}px;` : ''}
     color: rgba(0, 0, 0, 0.87);
     transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     overflow: hidden;
@@ -39,9 +41,9 @@ const CardContent = styled.div`
     padding: 16px;
 `
 
-const Card: React.FC<CardProps> = ({children, width, onClick}) => {
+const Card: React.FC<CardProps> = ({children, width, height, onClick}) => {
     return (
-        <CardContainer width={width ? width : undefined} onClick={onClick}>
+        <CardContainer width={width ? width : undefined}  height={height ? height : undefined} onClick={onClick}>
             <CardInset>
                 <CardContent>
                     {children}

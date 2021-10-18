@@ -1,4 +1,3 @@
-import {useEffect} from 'react';
 import styled from '../../ui-core/styled-components';
 import MaskedInput from 'react-text-mask';
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
@@ -25,40 +24,33 @@ type InputProps = {
     value: string,
     onChange?: (e:any) => void | undefined,
     disabled?: boolean | undefined
-    maskOptions?: any
+    maskOptions?: any,
 }
 
+const defaultMaskOptions = {
+    prefix: '$',
+    suffix: '',
+    includeThousandsSeparator: true,
+    thousandsSeparatorSymbol: '.',
+    allowDecimal: true,
+    decimalSymbol: ',',
+    decimalLimit: 10, // how many digits allowed after the decimal
+    integerLimit: 24, // limit length of integer numbers
+    allowNegative: false,
+    allowLeadingZeroes: true,
+  };
 
 
 const TokenInput: React.FC<InputProps> = ({value, onChange, disabled, maskOptions}) => {
     const regEx = /^[+]?\d*(?:[.,]\d*)?$/;
-
-    useEffect(()=>{},[value])
-
-    const defaultMaskOptions = {
-        prefix: '$',
-        suffix: '',
-        includeThousandsSeparator: true,
-        thousandsSeparatorSymbol: '.',
-        allowDecimal: true,
-        decimalSymbol: ',',
-        decimalLimit: 10, // how many digits allowed after the decimal
-        integerLimit: 24, // limit length of integer numbers
-        allowNegative: false,
-        allowLeadingZeroes: true,
-      };
-
-    let asd = maskOptions;
-
         const currencyMask = createNumberMask({
           ...defaultMaskOptions,
-          ...asd,
+          ...maskOptions,
         })
       
         return(
         <StyledInput 
             mask={currencyMask}
-            //  {...inputProps}
             autoComplete="off" 
             autoCorrect="off" 
             type="text" 

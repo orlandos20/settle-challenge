@@ -8,7 +8,7 @@ import {store, persistor} from './adapter/reduxHooks/store';
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider} from 'react-redux';
 import {BrowserRouter as Router} from 'react-router-dom';
-import {light, dark} from './app/ui-core/styles/theme';
+import {light} from './app/ui-core/styles/theme';
 
 ReactDOM.render(
   <React.StrictMode>

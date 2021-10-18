@@ -8,4 +8,4 @@ export const IupdateOrders = async (order:IOrder, dispatch:AppDispatch) => {
     const response = await dispatch(updateOrders(order));
     // parse data for UI here using response
     return response.payload;
-}
+};

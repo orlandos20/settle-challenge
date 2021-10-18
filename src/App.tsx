@@ -3,6 +3,9 @@ import {Switch, Route, useHistory, useLocation} from 'react-router-dom';
 import './app/ui-core/i18n';
 import './App.css';
 
+//Routes
+import {MAIN} from './app/ui-core/utils/routes';
+
 import MainPage from './app/screens/MainPage';
 
 function App() {
@@ -16,7 +19,7 @@ function App() {
   return (
     <div className="App">
       <Switch>
-        <Route exact path="/dashboard" component={MainPage} />
+        <Route exact path={`/${MAIN.dashboard}`} component={MainPage} />
       </Switch>
     </div>
     

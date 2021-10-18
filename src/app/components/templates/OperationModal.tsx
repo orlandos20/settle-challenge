@@ -1,4 +1,5 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback, useRef} from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from '../../ui-core/styled-components';
 import Modal from '../molecules/Modal';
 import OpModalBodyCard from '../atoms/OpModalBodyCard';
@@ -18,7 +19,6 @@ import { CurrencyOptions } from '../../../entities/CurrencyOptions';
 import CurrencyType from '../../../entities/CurrencyType';
 import OrderType from '../../../entities/OrderType';
 import orderOptions from '../../../entities/OrderOptions';
-import IOrder from '../../../entities/Order';
 
 const ModalContainer = styled.div`
     max-width: 480px;
@@ -45,6 +45,7 @@ type ModalProps = {
 }
 
 const OrderTypeModal: React.FC<ModalProps> = ({show, onClose, modalProps}) => {
+    const { t } = useTranslation();
     const options: CurrencyType[] = CurrencyOptions;
     const [fromAssetAmount, setFromAssetAmount] = useState<string>("");
     const [price, setPrice] = useState<number | undefined>();
@@ -52,14 +53,28 @@ const OrderTypeModal: React.FC<ModalProps> = ({show, onClose, modalProps}) => {
     const [orderType, setOrderType] = useState<OrderType>(orderOptions[0]);
     const [fromAssetType, setFromAssetType] = useState<CurrencyType>(options[1]);
     const [toAssetType, setToAssetType] = useState<CurrencyType>({value: 0, label: 'ARS'});
+    const [secondsAwaitToCall, setSecondsAwaitToCall] = useState<number>(0);
+
+    let timerHandler = useRef<any>();
 
     const dispatch = useAppDispatch();
     const tabOptions:OrderType[] = [...orderOptions];
 
     const fromAssetSelection = (val:CurrencyType) => setFromAssetType(val);
     const toAssetSelection = (val: CurrencyType) => setToAssetType(val);
-    const onChangeValue = (val:string) => setFromAssetAmount(val);
     const handleOpSelection = (val:OrderType) => setOrderType(val);
+
+    const onChangeValue = (val:string) => {
+        setFromAssetAmount(val);
+        setSecondsAwaitToCall(1.5);
+    }
+
+    const resetInputs = () => {
+        onChangeValue("");
+        setPrice(undefined);
+        setToAssetAmount(undefined);
+        
+    }
 
     const onOrderSubmit = () => {
         const order = {
@@ -76,41 +91,46 @@ const OrderTypeModal: React.FC<ModalProps> = ({show, onClose, modalProps}) => {
             toAsset: toAssetType.label
         }
         IupdateOrders(order, dispatch);
+        resetInputs();
         onClose();
     };
 
+    const getConversion = useCallback( async ()=>{
+        const currencyPrice = await IgetConversionRate(fromAssetType, toAssetType, dispatch);
+                let priceParsed = currencyPrice.quote * parseFloat(fromAssetAmount) / 100;
+                priceParsed = parseFloat(priceParsed.toFixed(4));
+                setPrice(parseFloat(currencyPrice.quote.toFixed(4)))
+                setToAssetAmount(priceParsed);
+    },[dispatch, fromAssetAmount, fromAssetType, toAssetType])
+
     useEffect(()=> {
-        //TODO: fix the await for untyped values
-        if(fromAssetAmount.length > 0){
-            (async () => {
-                setTimeout(async () => {
-                    const currencyPrice = await IgetConversionRate(fromAssetType, toAssetType, dispatch);
-                    let priceParsed = currencyPrice.quote * parseFloat(fromAssetAmount) / 100;
-                    priceParsed = parseFloat(priceParsed.toFixed(4));
-                    setPrice(parseFloat(currencyPrice.quote.toFixed(4)))
-                    setToAssetAmount(priceParsed);
-                },2000)
-            })()
+        if(secondsAwaitToCall > 0 && fromAssetAmount.length > 0){
+            timerHandler.current = setTimeout(()=>{
+                getConversion()
+            }, secondsAwaitToCall * 1000)
         }
-        else{
-            setToAssetAmount(undefined);
-        }
-    },[fromAssetAmount, dispatch, fromAssetType, toAssetType]);
+
+        return(()=>clearTimeout(timerHandler.current))
+    },[getConversion, secondsAwaitToCall, fromAssetAmount.length]);
 
     return (
         <Modal onClose={onClose} show={show}>
             <ModalContainer>
-                <OpModalHeader title={`${orderType.label} Order`}>
-                    <span>{modalProps && `${modalProps.label}ING`}</span>
+                <OpModalHeader title={`${orderType.label} ${t('order')}`}>
+                    <span>{modalProps?.label === "BUY" ? t('buying') : t('selling')}</span>
                     <Tabs options={tabOptions} onSelect={handleOpSelection}  />
                 </OpModalHeader>
                 <OpModalBody>
                     <OpModalBodyCard>
                         <TokenSelect options={options} onSelect={fromAssetSelection} defaultValue={fromAssetType}  />
-                        <TokenInput key={"fromAssetAmount"} value={fromAssetAmount ? fromAssetAmount.toString() : ""} onChange={onChangeValue} maskOptions={{ prefix: '', decimalSymbol:"."}} />
+                        <TokenInput 
+                            value={fromAssetAmount ? fromAssetAmount.toString() : ""} 
+                            onChange={onChangeValue}
+                            maskOptions={{ prefix: '', decimalSymbol:"."}} 
+                        />
                     </OpModalBodyCard>
                     <OpModalBodyCard title={"AT"}>
-                        <span style={{color: "#fff"}}>Price</span>
+                        <span style={{color: "#fff"}}>{t('price')}</span>
                         <TokenInput 
                             key={"price"} 
                             value={price ? price.toString() : ""} 
@@ -118,10 +138,9 @@ const OrderTypeModal: React.FC<ModalProps> = ({show, onClose, modalProps}) => {
                             disabled 
                         />
                     </OpModalBodyCard>
-                    <OpModalBodyCard title={modalProps?.label === "BUY" ? 'USING' : 'RECEIVING'}>
+                    <OpModalBodyCard title={modalProps?.label === "BUY" ? t('using') : t('receiving')}>
                         <TokenSelect options={[{value: 0, label: 'ARS'}]} onSelect={toAssetSelection} defaultValue={toAssetType}  />
                         <TokenInput 
-                            key={"toAssetValue"} 
                             value={toAssetAmount ? toAssetAmount.toString() : ""} 
                             maskOptions={{ prefix: '', thousandsSeparatorSymbol:",", decimalSymbol:"."}}
                             disabled
